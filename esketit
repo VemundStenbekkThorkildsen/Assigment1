@@ -1,0 +1,55 @@
+#include <iostream>
+#include <armadillo>
+using namespace std;
+using namespace arma;
+
+int main()
+{
+    int n=10;
+    double h=1./(n+1);
+    vec a_array(n-1);
+    vec b_array(n);
+    vec c_array(n-1); //n-2 som siste indeks
+    a_array.fill(-1);
+    b_array.fill(2);
+    c_array.fill(-1);
+
+    vec y_new(n);
+    vec x(n);
+
+    for(int i=0; i<n; i++) {
+        x(i) = (i+1)*h;
+    }
+    x.print();
+
+    vec y_array(n);
+    vec b_new(n);
+
+    y_array  = h*h*100*exp(-10*(x));
+
+    b_new[0] = b_array[0];
+    y_new[0] = y_array[0];
+
+    for (int i=1; i<n; i++) {
+        b_new(i) = b_array(i) - (c_array(i-1)*a_array(i-1))/b_new(i-1);
+        y_new(i) = y_array(i) - (y_new(i-1)*a_array(i-1))/b_new(i-1);
+    }
+
+    vec exact(n);
+    exact = 1.0-(1.0-exp(-10.0))*(x) - exp(-10*(x));
+
+    vec v(n);
+    v(n-1) = y_new(n-1)/b_new(n-1);
+
+    for (int j=n-2;j>=0;j--){
+        v(j) = (y_new(j)-c_array(j)*v(j+1))/b_new(j);
+
+    }
+
+    for (int j=1;j<n;j++){
+        cout << v(j) << " " << exact(j) << endl;
+    }
+
+    return 0;
+
+}
