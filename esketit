@@ -4,14 +4,13 @@
 using namespace std;
 using namespace arma;
 
-
 // oppgave 1b:
+
 /*
 int main()
 {
-    double time;
     clock_t start, finish;
-    start = clock();
+
 
  //   for (int l=1;l<=10e5;l++){
 
@@ -39,47 +38,57 @@ int main()
         b_new[0] = b_array[0];
         y_new[0] = y_array[0];
 
-        for (int i=1; i<n; i++) {
-            b_new(i) = b_array(i) - (c_array(i-1)*a_array(i-1))/b_new(i-1);
-            y_new(i) = y_array(i) - (y_new(i-1)*a_array(i-1))/b_new(i-1);
-        }
 
         vec exact(n);
         exact = 1.0-(1.0-exp(-10.0))*(x) - exp(-10.0*(x));
 
         vec v(n);
-        v(n-1) = y_new(n-1)/b_new(n-1);
         vec relError(n);
 
-
+        start = clock();
+        for (int i=1; i<n; i++) {
+            b_new(i) = b_array(i) - (c_array(i-1)*a_array(i-1))/b_new(i-1);
+            y_new(i) = y_array(i) - (y_new(i-1)*a_array(i-1))/b_new(i-1);
+        }
+        v(n-1) = y_new(n-1)/b_new(n-1);
         for (int j=n-2;j>=0;j--){
             v(j) = (y_new(j)-c_array(j)*v(j+1))/b_new(j);
+
+        }
+        finish = clock();
+
+        for (int j=n-2;j>=0;j--){
             relError = log10(abs((v(j)-exact(j))/exact(j)));
+
         }
 
-        cout << "X value:\tNumerical:\t Exact:\t Relative Error:" << endl;
-        for (int j=0;j<n;j++){
-            cout <<x(j)<<"\t"<< v(j) <<"\t "<<exact(j)<< relError << endl;
-        }
+    //    cout << "X value:\tNumerical:\t Exact:\t Relative Error:" << endl;
+   //     for (int j=0;j<n;j++){
+   //         cout <<x(j)<<"\t"<< v(j) <<"\t "<<exact(j)<< relError << endl;
+  //      }
   //  }
-    finish = clock();
-    time = ((finish-start)/CLOCKS_PER_SEC);
+    double time = ((double (finish) - double (start))/CLOCKS_PER_SEC);
     cout << "Time elapsed:"<< time << endl;
+
+//    ofstream filename("n101b.txt", ios::app);
+//            vec epsylon(n);
+//            for (int j=0;j<n;j++){
+//                epsylon(j) = log10(abs((v(j)-exact(j))/exact(j)));
+ //           }
+   //         filename << epsylon.min() << ", ";
+     //       filename.close();
 
     return 0;
 }
-*/
+
 // oppgave 1c:
 
-
+/*
 int main()
-
 {
-    double time;
     clock_t start, finish;
-    start = clock();
  //   for (int l=1;l<=10e5;l++){
-        int n=10000000;
+        int n=1000000;
         double h=1./(n+1);
 
         vec y_new(n); //"new" er tilde
@@ -102,43 +111,51 @@ int main()
         b_nevner = regspace<vec>(1,n);
         b_new = b_teller/b_nevner;
 
-        for (int i=1; i<n; i++) {
-            y_new(i) = y_array(i) + (y_new(i-1)/b_new(i-1));
-        }
-
         vec exact(n);
         exact = 1.0-(1.0-exp(-10.0))*(x) - exp(-10.0*(x));
-
 
         vec v(n);
         vec relError(n);
 
+        start = clock();
+        for (int i=1; i<n; i++) {
+            y_new(i) = y_array(i) + (y_new(i-1)/b_new(i-1));
+        }
         v(n-1) = y_new(n-1)/b_new(n-1);
-
         for (int j=n-2;j>=0;j--){
             v(j) = (y_new(j)+v(j+1))/b_new(j);
+        }
+        finish = clock();
+        for (int j=n-2;j>=0;j--){
             relError = log10(abs((v(j)-exact(j))/exact(j)));
         }
-        cout << "X value:\tNumerical:\t Exact:\t Relative Error:" << endl;
-        for (int j=0;j<n;j++){
-            cout <<x(j)<<"\t"<< v(j) <<"\t "<<exact(j) <<"\t "<<relError<< endl;
-        }
+//        cout << "X value:\tNumerical:\t Exact:\t Relative Error:" << endl;
+ //       for (int j=0;j<n;j++){
+ //           cout <<x(j)<<"\t"<< v(j) <<"\t "<<exact(j) <<"\t "<<relError<< endl;
+  //      }
   //  }
-    finish = clock();
-    time = ((finish-start)/CLOCKS_PER_SEC);
+
+    double time = ((double (finish) - double (start))/CLOCKS_PER_SEC);
     cout << "Time elapsed: "<< time << " seconds" << endl;
+
+//    ofstream filename("n10.txt", ios::app);
+  //          vec epsylon(n);
+    //        for (int j=0;j<n;j++){
+      //          epsylon(j) = log10(abs((v(j)-exact(j))/exact(j)));
+        //    }
+          //  filename << epsylon.min() << ", ";
+            //filename.close();
 
     return 0;
 }
 
-
-
+*/
 //oppgave 1d:
 
-/*
 int main()
 {
-    int n=10;
+    clock_t start, finish;
+    int n=100000;
     double h;
     h=1./(n+1);
     mat A = zeros(n,n);
@@ -155,19 +172,22 @@ int main()
         x(i) = (i+1)*h;
     }
     b=h*h*100*exp(-10*(x));
+    start=clock();
     vec sol = solve(A,b);
-    A.print("A=");
-    b.print("b=");
-    sol.print("sol=");
+    finish=clock();
+  //  A.print("A=");
+  //  b.print("b=");
+  //  sol.print("sol=");
 
     mat L,U,P;
-    lu(L,U,P,A);
-    (A*sol).print("A*x=");
-    L.print("L=");
-    U.print("U=");
-    (A*P*L*U).print("test");
+  //  lu(L,U,P,A);
+  //  (A*sol).print("A*x=");
+  //  L.print("L=");
+  //  U.print("U=");
+
+    double time = ((double (finish) - double (start))/CLOCKS_PER_SEC);
+    cout << "Time elapsed:"<< time << endl;
+
     return 0;
 
 }
-
-*/
