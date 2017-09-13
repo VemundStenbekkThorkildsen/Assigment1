@@ -4,25 +4,25 @@
 using namespace std;
 using namespace arma;
 
-// oppgave 1b:
-
+//Declaring the functions that come after int main()
 vec cfunc(vec y_new, vec y_array, vec exact, int n);
 vec dfunc(int n, vec y_array);
 
+// Exercise 1b:
 int main()
 {
-    //Declaring vectors and variables
-    clock_t start, finish;
-    int n=10;
+
+    clock_t start, finish; //times the program, comment out if not wanted
+    int n=100;
     double h=1./(n+1);
     vec a_array(n-1);
     vec b_array(n);
-    vec c_array(n-1); //n-2 som siste indeks
+    vec c_array(n-1); //diagonals in the matrix set up as vectors
     a_array.fill(-1);
     b_array.fill(2);
-    c_array.fill(-1);
+    c_array.fill(-1); //filling these arrays with integers
 
-    //Declaring step-length h
+    //Declaring step-length x
     vec x(n);
     for(int i=0; i<n; i++) {
         x(i) = (i+1)*h;
@@ -42,7 +42,7 @@ int main()
     start = clock();
     for (int i=1; i<n; i++) {
         b_new(i) = b_array(i) - (c_array(i-1)*a_array(i-1))/b_new(i-1);
-        y_new(i) = y_array(i) - (y_new(i-1)*a_array(i-1))/b_new(i-1);
+        y_new(i) = y_array(i) - (y_new(i-1)*a_array(i-1))/b_new(i-1); //b_new and f_new are from forward substitution
     }
 
     //Calculating vector v from y-tilde and a,b,c-arrays
@@ -53,22 +53,24 @@ int main()
     }
     finish = clock();
 
-    //Finding the relative error of the numerical and exact solutions
+    //Finding the relative error of the numerical solutions compared to the exact
     vec relErrorr(n);
     for (int j=n-2;j>=0;j--){
         relErrorr = log10(abs((v(j)-exact(j))/exact(j)));
     }
 
     double time = ((double (finish) - double (start))/CLOCKS_PER_SEC);
-    cout << "Time elapsed:"<< time << endl;
-    vec fromCfunc(n);
-    vec fromDfunc(n);
+    //cout << "Time elapsed:"<< time << endl;
+    vec fromCfunc(n); //calling exercise 1c
+    vec fromDfunc(n); //calling exercise 1d, comment these out if you dont want to see them
     fromCfunc=cfunc(y_new, y_array, exact, n);
-    fromDfunc=dfunc(n, y_array);
+    //fromDfunc=dfunc(n, y_array);
     return 0;
+    /*We wanted to have seperate functions for the different exercises given in project 1 to
+     * make the code seem as neat as possible */
 }
 
-// oppgave 1c:
+// Exercise 1c:
 vec cfunc(vec y_new, vec y_array, vec exact, int n)
 {
 //    clock_t start, finish;
@@ -80,46 +82,57 @@ vec cfunc(vec y_new, vec y_array, vec exact, int n)
     b_new = b_teller/b_nevner;
     y_new[0] = y_array[0];
 
+    //Our specialized algorithm to solve a matrix with identical elements
 //    start = clock();
     for (int i=1; i<n; i++) {
         y_new(i) = y_array(i) + (y_new(i-1)/b_new(i-1));
     }
 
+    //Using the special algorithm to find a new vector v
+//    ofstream vektorv;
+//    vektorv.open("vc10.txt");
     vec v(n);
     v(n-1) = y_new(n-1)/b_new(n-1);
     for (int j=n-2;j>=0;j--){
         v(j) = (y_new(j)+v(j+1))/b_new(j);
+//        vektorv << v(j) << ", ";
     }
-//  finish = clock();
+//    vektorv.close();
+//    finish = clock();
 
+    //Finding the relative error between our numerical solution and the exact solution
+//    ofstream RE;
+//    RE.open("relativeerror.txt");
     vec relError(n);
     for (int j=n-2;j>=0;j--){
         relError(j) = log10(abs((v(j)-exact(j))/exact(j)));
+//        RE << relError(j) << ", ";
     }
+//    RE.close();
 
     return relError;
 }
 
-// d
+// Exercise d
 
 vec dfunc(int n, vec y_array)
 {
-    mat A = zeros(n,n);
-    A(n-1,n-1)=2; //for å kun bruke 1 forløkke
-    for (int i=0;i<n-1;i++){
-        A(i,i)=2;
+    mat A = zeros(n,n); //creating a matrix for the first time
+    A(n-1,n-1)=2;
+    for (int i=0;i<n-1;i++){ //creating a single for-loop
+        A(i,i)=2; //all diagonals are 2
         A(i,i+1)=-1;
-        A(i+1,i)=-1;
+        A(i+1,i)=-1; //upper and lower diagonals are -1
     }
   //  start=clock();
     vec sol;
-    sol=solve(A,y_array);
+    sol=solve(A,y_array); //solving the n sets of linear equations form A
   //  finish=clock();
 
     mat L,U,P;
     vec lusolv;
-    lusolv=lu(L,U,P,A);
+    lusolv=lu(L,U,P,A); //doing the LU-decomposition
 
-    return sol;
+    return sol; //returning values back to int main
 
 }
