@@ -6,8 +6,8 @@ using namespace arma;
 
 // oppgave 1b:
 
-vec cunt(vec y_new, vec y_array, vec exact, int n);
-vec dunt(int n, vec y_array);
+vec cfunc(vec y_new, vec y_array, vec exact, int n);
+vec dfunc(int n, vec y_array);
 
 int main()
 {
@@ -61,15 +61,15 @@ int main()
 
     double time = ((double (finish) - double (start))/CLOCKS_PER_SEC);
     cout << "Time elapsed:"<< time << endl;
-    vec fromCunt(n);
-    vec fromDunt(n);
-    fromCunt=cunt(y_new, y_array, exact, n);
-    fromDunt=dunt(n, y_array);
+    vec fromCfunc(n);
+    vec fromDfunc(n);
+    fromCfunc=cfunc(y_new, y_array, exact, n);
+    fromDfunc=dfunc(n, y_array);
     return 0;
 }
 
 // oppgave 1c:
-vec cunt(vec y_new, vec y_array, vec exact, int n)
+vec cfunc(vec y_new, vec y_array, vec exact, int n)
 {
 //    clock_t start, finish;
     vec b_teller(n);
@@ -102,7 +102,7 @@ vec cunt(vec y_new, vec y_array, vec exact, int n)
 
 // d
 
-vec dunt(int n, vec y_array)
+vec dfunc(int n, vec y_array)
 {
     mat A = zeros(n,n);
     A(n-1,n-1)=2; //for å kun bruke 1 forløkke
