@@ -4,6 +4,7 @@
 using namespace std;
 using namespace arma;
 
+
 // oppgave 1b:
 
 /*
@@ -14,7 +15,8 @@ int main()
 
  //   for (int l=1;l<=10e5;l++){
 
-        int n=1000000;
+
+        int n=10;
         double h=1./(n+1);
         vec a_array(n-1);
         vec b_array(n);
@@ -39,6 +41,7 @@ int main()
         y_new[0] = y_array[0];
 
 
+
         vec exact(n);
         exact = 1.0-(1.0-exp(-10.0))*(x) - exp(-10.0*(x));
 
@@ -55,6 +58,14 @@ int main()
             v(j) = (y_new(j)-c_array(j)*v(j+1))/b_new(j);
 
         }
+        ofstream filename("general_and_exact10.txt", ios::app);
+          for (int i=0;i<n;i++){
+
+              filename << x(i) << ", "<< v(i) << ", " << exact(i) << endl;
+
+          }
+          filename.close();
+
         finish = clock();
 
         for (int j=n-2;j>=0;j--){
@@ -63,9 +74,9 @@ int main()
         }
 
     //    cout << "X value:\tNumerical:\t Exact:\t Relative Error:" << endl;
-   //     for (int j=0;j<n;j++){
-   //         cout <<x(j)<<"\t"<< v(j) <<"\t "<<exact(j)<< relError << endl;
-  //      }
+    //    for (int j=0;j<n;j++){
+    //        cout <<x(j)<<"\t"<< v(j) <<"\t "<<exact(j)<< relError << endl;
+     //   }
   //  }
     double time = ((double (finish) - double (start))/CLOCKS_PER_SEC);
     cout << "Time elapsed:"<< time << endl;
@@ -81,9 +92,12 @@ int main()
     return 0;
 }
 
+*/
+
+
 // oppgave 1c:
 
-/*
+
 int main()
 {
     clock_t start, finish;
@@ -111,11 +125,14 @@ int main()
         b_nevner = regspace<vec>(1,n);
         b_new = b_teller/b_nevner;
 
+
         vec exact(n);
         exact = 1.0-(1.0-exp(-10.0))*(x) - exp(-10.0*(x));
 
+
         vec v(n);
         vec relError(n);
+
 
         start = clock();
         for (int i=1; i<n; i++) {
@@ -149,9 +166,10 @@ int main()
     return 0;
 }
 
-*/
+
 //oppgave 1d:
 
+/*
 int main()
 {
     clock_t start, finish;
@@ -191,3 +209,5 @@ int main()
     return 0;
 
 }
+
+*/
