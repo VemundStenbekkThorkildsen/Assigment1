@@ -4,178 +4,106 @@
 using namespace std;
 using namespace arma;
 
-
 // oppgave 1b:
 
-/*
+vec cunt(vec y_new, vec y_array, vec exact, int n);
+vec dunt(int n, vec y_array);
+
 int main()
 {
+    //Declaring vectors and variables
     clock_t start, finish;
+    int n=10;
+    double h=1./(n+1);
+    vec a_array(n-1);
+    vec b_array(n);
+    vec c_array(n-1); //n-2 som siste indeks
+    a_array.fill(-1);
+    b_array.fill(2);
+    c_array.fill(-1);
 
+    //Declaring step-length h
+    vec x(n);
+    for(int i=0; i<n; i++) {
+        x(i) = (i+1)*h;
+    }
 
- //   for (int l=1;l<=10e5;l++){
+    //Defining y and the closed form as given in the project
+    vec y_array(n);
+    y_array  = h*h*100*exp(-10*(x));
+    vec exact(n);
+    exact = 1.0-(1.0-exp(-10.0))*(x) - exp(-10.0*(x));
 
+    //Gaussian elimination
+    vec b_new(n);
+    vec y_new(n); //"new" er tilde
+    b_new[0] = b_array[0];
+    y_new[0] = y_array[0];
+    start = clock();
+    for (int i=1; i<n; i++) {
+        b_new(i) = b_array(i) - (c_array(i-1)*a_array(i-1))/b_new(i-1);
+        y_new(i) = y_array(i) - (y_new(i-1)*a_array(i-1))/b_new(i-1);
+    }
 
-        int n=10;
-        double h=1./(n+1);
-        vec a_array(n-1);
-        vec b_array(n);
-        vec c_array(n-1); //n-2 som siste indeks
-        a_array.fill(-1);
-        b_array.fill(2);
-        c_array.fill(-1);
+    //Calculating vector v from y-tilde and a,b,c-arrays
+    vec v(n);
+    v(n-1) = y_new(n-1)/b_new(n-1);
+    for (int j=n-2;j>=0;j--){
+        v(j) = (y_new(j)-c_array(j)*v(j+1))/b_new(j);
+    }
+    finish = clock();
 
-        vec y_new(n); //"new" er tilde
-        vec x(n);
+    //Finding the relative error of the numerical and exact solutions
+    vec relErrorr(n);
+    for (int j=n-2;j>=0;j--){
+        relErrorr = log10(abs((v(j)-exact(j))/exact(j)));
+    }
 
-        for(int i=0; i<n; i++) {
-            x(i) = (i+1)*h;
-        }
-
-        vec y_array(n);
-        vec b_new(n);
-
-        y_array  = h*h*100*exp(-10*(x));
-
-        b_new[0] = b_array[0];
-        y_new[0] = y_array[0];
-
-
-
-        vec exact(n);
-        exact = 1.0-(1.0-exp(-10.0))*(x) - exp(-10.0*(x));
-
-        vec v(n);
-        vec relError(n);
-
-        start = clock();
-        for (int i=1; i<n; i++) {
-            b_new(i) = b_array(i) - (c_array(i-1)*a_array(i-1))/b_new(i-1);
-            y_new(i) = y_array(i) - (y_new(i-1)*a_array(i-1))/b_new(i-1);
-        }
-        v(n-1) = y_new(n-1)/b_new(n-1);
-        for (int j=n-2;j>=0;j--){
-            v(j) = (y_new(j)-c_array(j)*v(j+1))/b_new(j);
-
-        }
-        ofstream filename("general_and_exact10.txt", ios::app);
-          for (int i=0;i<n;i++){
-
-              filename << x(i) << ", "<< v(i) << ", " << exact(i) << endl;
-
-          }
-          filename.close();
-
-        finish = clock();
-
-        for (int j=n-2;j>=0;j--){
-            relError = log10(abs((v(j)-exact(j))/exact(j)));
-
-        }
-
-    //    cout << "X value:\tNumerical:\t Exact:\t Relative Error:" << endl;
-    //    for (int j=0;j<n;j++){
-    //        cout <<x(j)<<"\t"<< v(j) <<"\t "<<exact(j)<< relError << endl;
-     //   }
-  //  }
     double time = ((double (finish) - double (start))/CLOCKS_PER_SEC);
     cout << "Time elapsed:"<< time << endl;
-
-//    ofstream filename("n101b.txt", ios::app);
-//            vec epsylon(n);
-//            for (int j=0;j<n;j++){
-//                epsylon(j) = log10(abs((v(j)-exact(j))/exact(j)));
- //           }
-   //         filename << epsylon.min() << ", ";
-     //       filename.close();
-
+    vec fromCunt(n);
+    vec fromDunt(n);
+    fromCunt=cunt(y_new, y_array, exact, n);
+    fromDunt=dunt(n, y_array);
     return 0;
 }
-
-*/
-
 
 // oppgave 1c:
-
-
-int main()
+vec cunt(vec y_new, vec y_array, vec exact, int n)
 {
-    clock_t start, finish;
- //   for (int l=1;l<=10e5;l++){
-        int n=1000000;
-        double h=1./(n+1);
+//    clock_t start, finish;
+    vec b_teller(n);
+    vec b_nevner(n);
+    vec b_new(n);
+    b_teller = regspace<vec>(2,n+1);
+    b_nevner = regspace<vec>(1,n);
+    b_new = b_teller/b_nevner;
+    y_new[0] = y_array[0];
 
-        vec y_new(n); //"new" er tilde
-        vec x(n);
+//    start = clock();
+    for (int i=1; i<n; i++) {
+        y_new(i) = y_array(i) + (y_new(i-1)/b_new(i-1));
+    }
 
-        for(int i=0; i<n; i++) {
-            x(i) = (i+1)*h;
-        }
+    vec v(n);
+    v(n-1) = y_new(n-1)/b_new(n-1);
+    for (int j=n-2;j>=0;j--){
+        v(j) = (y_new(j)+v(j+1))/b_new(j);
+    }
+//  finish = clock();
 
-        vec y_array(n);
+    vec relError(n);
+    for (int j=n-2;j>=0;j--){
+        relError(j) = log10(abs((v(j)-exact(j))/exact(j)));
+    }
 
-        y_array  = h*h*100*exp(-10*(x));
-
-        vec b_teller(n);
-        vec b_nevner(n);
-        vec b_new(n);
-        y_new[0] = y_array[0];
-
-        b_teller = regspace<vec>(2,n+1);
-        b_nevner = regspace<vec>(1,n);
-        b_new = b_teller/b_nevner;
-
-
-        vec exact(n);
-        exact = 1.0-(1.0-exp(-10.0))*(x) - exp(-10.0*(x));
-
-
-        vec v(n);
-        vec relError(n);
-
-
-        start = clock();
-        for (int i=1; i<n; i++) {
-            y_new(i) = y_array(i) + (y_new(i-1)/b_new(i-1));
-        }
-        v(n-1) = y_new(n-1)/b_new(n-1);
-        for (int j=n-2;j>=0;j--){
-            v(j) = (y_new(j)+v(j+1))/b_new(j);
-        }
-        finish = clock();
-        for (int j=n-2;j>=0;j--){
-            relError = log10(abs((v(j)-exact(j))/exact(j)));
-        }
-//        cout << "X value:\tNumerical:\t Exact:\t Relative Error:" << endl;
- //       for (int j=0;j<n;j++){
- //           cout <<x(j)<<"\t"<< v(j) <<"\t "<<exact(j) <<"\t "<<relError<< endl;
-  //      }
-  //  }
-
-    double time = ((double (finish) - double (start))/CLOCKS_PER_SEC);
-    cout << "Time elapsed: "<< time << " seconds" << endl;
-
-//    ofstream filename("n10.txt", ios::app);
-  //          vec epsylon(n);
-    //        for (int j=0;j<n;j++){
-      //          epsylon(j) = log10(abs((v(j)-exact(j))/exact(j)));
-        //    }
-          //  filename << epsylon.min() << ", ";
-            //filename.close();
-
-    return 0;
+    return relError;
 }
 
+// d
 
-//oppgave 1d:
-
-/*
-int main()
+vec dunt(int n, vec y_array)
 {
-    clock_t start, finish;
-    int n=100000;
-    double h;
-    h=1./(n+1);
     mat A = zeros(n,n);
     A(n-1,n-1)=2; //for å kun bruke 1 forløkke
     for (int i=0;i<n-1;i++){
@@ -183,31 +111,15 @@ int main()
         A(i,i+1)=-1;
         A(i+1,i)=-1;
     }
-
-    vec b(n);
-    vec x(n);
-    for(int i=0; i<n; i++) {
-        x(i) = (i+1)*h;
-    }
-    b=h*h*100*exp(-10*(x));
-    start=clock();
-    vec sol = solve(A,b);
-    finish=clock();
-  //  A.print("A=");
-  //  b.print("b=");
-  //  sol.print("sol=");
+  //  start=clock();
+    vec sol;
+    sol=solve(A,y_array);
+  //  finish=clock();
 
     mat L,U,P;
-  //  lu(L,U,P,A);
-  //  (A*sol).print("A*x=");
-  //  L.print("L=");
-  //  U.print("U=");
+    vec lusolv;
+    lusolv=lu(L,U,P,A);
 
-    double time = ((double (finish) - double (start))/CLOCKS_PER_SEC);
-    cout << "Time elapsed:"<< time << endl;
-
-    return 0;
+    return sol;
 
 }
-
-*/
